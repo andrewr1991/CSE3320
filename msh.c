@@ -26,19 +26,19 @@ int main( void ) {
       exit(1);
     }
 //put everything else above the fork
-    if (strcmp(command1, "ls") == 0) {
+    else if (strcmp(command1, "ls") == 0) {
       pid_t child_pid = fork();
       int status;
 
-      if( child_pid == 0 )
-      {
+      if( child_pid == 0 ) {
         execl("/bin/ls", "ls", NULL );
         exit( EXIT_SUCCESS );
       }
       waitpid( child_pid, &status, 0 );
     }
+
     else {
-      if (strcmp(command1, "\n") != 0) {
+      if ((int)*command1 != 0) {
         printf("%s : Command not found.\n", command1);
       }
     }
