@@ -124,16 +124,29 @@ while (1) {
     }
 
     char * historyCmd;
-    historyCmd = strtok (token[0],"!");
-    printf("%s\n", historyCmd);
+    historyCmd = strtok(token[0],"!");
+    int historyCmdToInt = (int)*historyCmd;
 
-/*
-    while (historyCmd != NULL)
-      {
-        printf ("%s\n", historyCmd);
-        historyCmd = strtok(NULL, "!");
+    int charSum = (*(token[0] + 1)) + (*(token[0] + 2));
+
+    printf("%d\n", charSum);
+
+
+    //printf("%d\n", historyCmdToInt);
+    //printf("%s\n\n\n\n", historyCmd);
+
+
+    if (strchr("!", *token[0])) {
+      if (((int)*historyCmd) >= 0 && ((int)*historyCmd) <= 14) {
+        printf("%s\n", historyCmd);
       }
-*/
+      else {
+        printf("Command not in history.\n");
+        continue;
+      }
+    }
+
+
     if( token[0] == '\0')
       continue;
 
