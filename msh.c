@@ -55,13 +55,7 @@ char *token[MAX_NUM_ARGUMENTS];
 
 // Declare history 2D char array
 char history[15][100];
-
-for (int i = 0; i < 15; i++) {
-  memset(history[i], 0, 100);
-}
-
-printf("%c", history[1]);
-
+int counter = 0;
 
 while (1) {
   printf("msh> ");
@@ -110,23 +104,36 @@ while (1) {
     free( working_root );
 
 
-
+/*
     // Rotate array algorithm
     for (int i = 0; i < 15; i++) {
       char temp[100];
       strcpy(temp, history[i + 1]);
       strcpy(history[i + 1], temp);
     }
+*/
 
-    strcpy(history[0], token[0]);
+    strcpy(history[counter], token[0]);
+    counter++;
 
-    for (int i = 0; i < 15; i++) {
-      printf("%s %d\n", history[i], i);
+    if (strcmp(token[0], "history") == 0) {
+      for (int i = 0; i < counter; i++) {
+        printf("%d: %s\n", i, history[i]);
+      }
+      continue;
     }
 
+    char * historyCmd;
+    historyCmd = strtok (token[0],"!");
+    printf("%s\n", historyCmd);
 
-
-
+/*
+    while (historyCmd != NULL)
+      {
+        printf ("%s\n", historyCmd);
+        historyCmd = strtok(NULL, "!");
+      }
+*/
     if( token[0] == '\0')
       continue;
 

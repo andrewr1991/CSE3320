@@ -2,7 +2,7 @@
 #include <string.h>
 
 int main() {
-  char history[10][100];
+  char history[11][100];
   strcpy(history[0], "history command 1");
   strcpy(history[1], "history command 2");
   strcpy(history[2], "history command 3");
@@ -30,11 +30,5 @@ int main() {
   for (int i = 0; i < 10; i++) {
     printf("%s\n", history[i]);
   }
-
-/*
-  for (int i = 0; i < sizeof(history)/4; i++) {
-    printf("Testing %d\n", i);
-  }
-*/
   return 0;
 }
