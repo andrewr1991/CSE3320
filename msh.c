@@ -54,7 +54,7 @@ int main( void ) {
 char *token[MAX_NUM_ARGUMENTS];
 
 // Declare history 2D char array
-char history[15][100];
+char history[5][100];
 int counter = 0;
 
 while (1) {
@@ -103,18 +103,25 @@ while (1) {
 
     free( working_root );
 
-    if (counter <= 14) {
+    if (counter <= 4) {
       strcpy(history[counter], token[0]);
     }
 
-    if (counter < 15) {
+    if (counter < 5) {
       counter++;
     }
     else {
-      for (int i = 0; i < counter - 1; i++) {
+      for (int i = 0; i < counter; i++) {
         strcpy(history[i], history[i + 1]);
       }
-      strcpy(history[14], token[0]);
+      strcpy(history[4], token[0]);
+    }
+
+    if (strcmp(token[0], "history") == 0) {
+      for (int i = 0; i < counter; i++) {
+        printf("%d: %s\n", i, history[i]);
+      }
+      continue;
     }
 
     int first = 0;
@@ -129,22 +136,15 @@ while (1) {
     else {
       charSum = first;
     }
-    printf("%d\n\n", charSum);
+
     if (strchr("!", *token[0])) {
-      if (charSum >= 0 && charSum <= 14) {
-        token[0] = history[charSum];
+      if (charSum >= 0 && charSum <= 4) {
+        strcpy(token[0], history[charSum]);
       }
       else {
         printf("Command not in history.\n");
         continue;
       }
-    }
-
-    if (strcmp(token[0], "history") == 0) {
-      for (int i = 0; i < counter; i++) {
-        printf("%d: %s\n", i, history[i]);
-      }
-      continue;
     }
 
     if( token[0] == '\0')
