@@ -103,24 +103,18 @@ while (1) {
 
     free( working_root );
 
-
-/*
-    // Rotate array algorithm
-    for (int i = 0; i < 15; i++) {
-      char temp[100];
-      strcpy(temp, history[i + 1]);
-      strcpy(history[i + 1], temp);
+    if (counter <= 14) {
+      strcpy(history[counter], token[0]);
     }
-*/
 
-    strcpy(history[counter], token[0]);
-    counter++;
-
-    if (strcmp(token[0], "history") == 0) {
-      for (int i = 0; i < counter; i++) {
-        printf("%d: %s\n", i, history[i]);
+    if (counter < 15) {
+      counter++;
+    }
+    else {
+      for (int i = 0; i < counter - 1; i++) {
+        strcpy(history[i], history[i + 1]);
       }
-      continue;
+      strcpy(history[14], token[0]);
     }
 
     int first = 0;
@@ -135,7 +129,7 @@ while (1) {
     else {
       charSum = first;
     }
-
+    printf("%d\n\n", charSum);
     if (strchr("!", *token[0])) {
       if (charSum >= 0 && charSum <= 14) {
         token[0] = history[charSum];
@@ -146,6 +140,12 @@ while (1) {
       }
     }
 
+    if (strcmp(token[0], "history") == 0) {
+      for (int i = 0; i < counter; i++) {
+        printf("%d: %s\n", i, history[i]);
+      }
+      continue;
+    }
 
     if( token[0] == '\0')
       continue;
