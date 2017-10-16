@@ -53,8 +53,12 @@ int main( void ) {
 /* Parse input */
 char *token[MAX_NUM_ARGUMENTS];
 
-// Declare history 2D char array
-char history[5][100];
+// Declare 2D array that will hold the history of user commands
+// tempCmd will be used later on for history
+// counter will be used to keep track of how many commands the user has entered
+// to know how many to show
+char history[15][100];
+char tempCmd[100];
 int counter = 0;
 
 while (1) {
@@ -103,20 +107,72 @@ while (1) {
 
     free( working_root );
 
-    if (counter <= 4) {
+    // If the user hit return with no command, the code will return back to the
+    // beginning of the loop and wait for another command.
+    if( token[0] == '\0') {
+      continue;
+    }
+
+    // If the counter variable is less than or equal to 14, then add the latest
+    // command to the history array. In other words, before the history list must
+    // rotate through commands, the current command will just simply be added to
+    // the array.
+    if (counter <= 14) {
       strcpy(history[counter], token[0]);
     }
 
-    if (counter < 5) {
+    // Before the counter variable is less than 15, counter will simply be incremented
+    // however whenever counter is greater than or equal to 15, the subroutine
+    // to rotate the history array will be called. The tempCmd variable below will
+    // hold the earliest user command to be used later.
+    if (counter < 15) {
       counter++;
     }
     else {
+      strcpy(tempCmd, history[0]);
       for (int i = 0; i < counter; i++) {
         strcpy(history[i], history[i + 1]);
       }
-      strcpy(history[4], token[0]);
+      strcpy(history[14], token[0]);
     }
 
+    // These variables below are all to keep track of the number entered after the
+    // exclamation point. For example, with the command !12.
+    int first = 0;
+    int second = 0;
+    int charSum = 0;
+    first = (*(token[0] + 1)) - 48;
+    second = (*(token[0] + 2)) - 48;
+
+    // Code to concatenate the numbers after the exclamation point. For example,
+    // !12 is 1 and 2 which becomes 12.
+    // If !10 through !14 is entered
+    if ((*(token[0] + 2)) != 0) {
+      charSum = (first * 10) + second;
+    }
+    // If !0 through !9 is entered
+    else {
+      charSum = first;
+    }
+    if (strchr("!", *token[0])) {
+      // If !1 through !14 is entered, token[0]'s value becomes the command at
+      // index charSum of the history array.
+      if (charSum > 0 && charSum <= 14) {
+        strcpy(token[0], history[charSum - 1]);
+      }
+      // If !0 is entered, token[0]'s value becomes tempCmd
+      else if (charSum == 0) {
+        strcpy(token[0], tempCmd);
+      }
+      // If anything other than !0 through !14 is entered
+      else {
+        printf("Command not in history.\n");
+        continue;
+      }
+    }
+
+    // Loop through the history array and print the conents if the current command
+    // equals "history".
     if (strcmp(token[0], "history") == 0) {
       for (int i = 0; i < counter; i++) {
         printf("%d: %s\n", i, history[i]);
@@ -124,81 +180,48 @@ while (1) {
       continue;
     }
 
-    int first = 0;
-    int second = 0;
-    int charSum = 0;
-    first = (*(token[0] + 1)) - 48;
-    second = (*(token[0] + 2)) - 48;
-
-    if ((*(token[0] + 2)) != 0) {
-      charSum = (first * 10) + second;
-    }
-    else {
-      charSum = first;
-    }
-
-    if (strchr("!", *token[0])) {
-      if (charSum >= 0 && charSum <= 4) {
-        strcpy(token[0], history[charSum]);
-      }
-      else {
-        printf("Command not in history.\n");
-        continue;
-      }
-    }
-
-    if( token[0] == '\0')
-      continue;
-
+    // If the current command equals "exit" or "quit", exit the shell via exit(0).
     if (strcmp(token[0], "exit") == 0 || strcmp(token[0], "quit") == 0) {
       exit(0);
     }
 
+    // If the current command equals "cd", call the cd shell command via chdir.
   if (strcmp(token[0], "cd") == 0) {
     chdir(token[1]);
     continue;
   }
-// tokenize anything after command and put in place of NULL in exec - up through 9 command
-// initialize all to null
 
-    /* Call exec with ./ - the local directory */
+  // Initialize the path array to the current directory and then concatenate
     char path[100] = "./";
     strcat(path, token[0]);
 
     pid_t child_pid = fork();
 
-
     if ( child_pid == 0 ) {
       execl(path, token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7], token[8], token[9],NULL );
 
-      /* Call exec with /usr/local/bin */
       memset(path, 0, 100);
       strncpy(path, "/usr/local/bin/", strlen("/usr/local/bin/"));
       strcat(path, token[0]);
       execl(path, token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7], token[8], token[9], NULL );
 
-      /* Call exec with /usr/bin */
       memset(path, 0, 100);
       strncpy(path, "/usr/bin/", strlen("/usr/bin/"));
       strcat(path, token[0]);
       execl(path, token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7], token[8], token[9], NULL );
 
-      /* Call exec with /bin */
       memset(path, 0, 100);
       strncpy(path, "/bin/", strlen("/bin/"));
       strcat(path, token[0]);
       execl(path, token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7], token[8], token[9], NULL );
       printf("%s: Command not found.\n", token[0]);
       exit( EXIT_SUCCESS );
+    }
+    else {
+      int status;
+      wait(&status);
+    }
 
-
-  }
-  else {
-
-    int status;
-    wait(&status);
-  }
 }
-    //if strcmp cd == 0 then change to second part of command - chdir command
   return 0;
 }
