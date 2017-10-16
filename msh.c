@@ -50,27 +50,26 @@
 
 int main( void ) {
 
-/* Parse input */
-char *token[MAX_NUM_ARGUMENTS];
+  /* Parse input */
+  char *token[MAX_NUM_ARGUMENTS];
 
-// Declare 2D array that will hold the history of user commands
-// tempCmd will be used later on for history
-// counter will be used to keep track of how many commands the user has entered
-// to know how many to show
-char history[15][100];
-char tempCmd[100];
-int counter = 0;
+  // Declare 2D array that will hold the history of user commands
+  // tempCmd will be used later on for history
+  // counter will be used to keep track of how many commands the user has entered
+  // to know how many to show
+  char history[15][100];
+  char tempCmd[100];
+  int counter = 0;
 
-while (1) {
-  printf("msh> ");
+  while (1) {
+    printf("msh> ");
 
-  int i = 0;
-  for( i = 0; i < 10; i ++ )
-  {
-    token[i] = NULL;
-  }
+    int i = 0;
+    for( i = 0; i < 10; i ++ ) {
+      token[i] = NULL;
+    }
 
-  char * cmd_str = (char*) malloc( MAX_COMMAND_SIZE );
+    char * cmd_str = (char*) malloc( MAX_COMMAND_SIZE );
 
     // Read the command from the commandline.  The
     // maximum command that will be read is MAX_COMMAND_SIZE
@@ -78,7 +77,6 @@ while (1) {
     // inputs something since fgets returns NULL when there
     // is no input
     while( !fgets (cmd_str, MAX_COMMAND_SIZE, stdin) );
-
 
     int token_count = 0;
 
@@ -94,15 +92,12 @@ while (1) {
     char *working_root = working_str;
 
     // Tokenize the input stringswith whitespace used as the delimiter
-    while ( ( (arg_ptr = strsep(&working_str, WHITESPACE ) ) != NULL) &&
-              (token_count<MAX_NUM_ARGUMENTS))
-    {
+    while ( ( (arg_ptr = strsep(&working_str, WHITESPACE ) ) != NULL) && (token_count<MAX_NUM_ARGUMENTS)) {
       token[token_count] = strndup( arg_ptr, MAX_COMMAND_SIZE );
-      if( strlen( token[token_count] ) == 0 )
-      {
+      if( strlen( token[token_count] ) == 0 ) {
         token[token_count] = NULL;
       }
-        token_count++;
+      token_count++;
     }
 
     free( working_root );
@@ -154,9 +149,10 @@ while (1) {
     else {
       charSum = first;
     }
+
+    // If !1 through !14 is entered, token[0]'s value becomes the command at
+    // index charSum of the history array.
     if (strchr("!", *token[0])) {
-      // If !1 through !14 is entered, token[0]'s value becomes the command at
-      // index charSum of the history array.
       if (charSum > 0 && charSum <= 14) {
         strcpy(token[0], history[charSum - 1]);
       }
@@ -177,7 +173,7 @@ while (1) {
       for (int i = 0; i < counter; i++) {
         printf("%d: %s\n", i, history[i]);
       }
-      continue;
+    continue;
     }
 
     // If the current command equals "exit" or "quit", exit the shell via exit(0).
@@ -186,30 +182,38 @@ while (1) {
     }
 
     // If the current command equals "cd", call the cd shell command via chdir.
-  if (strcmp(token[0], "cd") == 0) {
-    chdir(token[1]);
-    continue;
-  }
+    if (strcmp(token[0], "cd") == 0) {
+      chdir(token[1]);
+      continue;
+    }
 
-  // Initialize the path array to the current directory and then concatenate
+    // Initialize the path array to the current directory and then concatenate the
+    // current command onto the end of "./"
     char path[100] = "./";
     strcat(path, token[0]);
 
     pid_t child_pid = fork();
 
+    // In all of the exec calls below, memset is used to set the path array to all
+    // zeros, each new directory is then copied into path using strcpy, then strcat
+    // is used to concatenate the current command onto the end of the new directory.
     if ( child_pid == 0 ) {
+      // Call exec with the current command and search in the current directory
       execl(path, token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7], token[8], token[9],NULL );
 
+      // Call exec with the current command and search in the /usr/local/bin/ directory
       memset(path, 0, 100);
       strncpy(path, "/usr/local/bin/", strlen("/usr/local/bin/"));
       strcat(path, token[0]);
       execl(path, token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7], token[8], token[9], NULL );
 
+      // Call exec with the current command and search in the /usr/bin/ directory
       memset(path, 0, 100);
       strncpy(path, "/usr/bin/", strlen("/usr/bin/"));
       strcat(path, token[0]);
       execl(path, token[0], token[1], token[2], token[3], token[4], token[5], token[6], token[7], token[8], token[9], NULL );
 
+      // Call exec with the current command and search in the /bin/ directory
       memset(path, 0, 100);
       strncpy(path, "/bin/", strlen("/bin/"));
       strcat(path, token[0]);
@@ -221,7 +225,6 @@ while (1) {
       int status;
       wait(&status);
     }
-
-}
-  return 0;
+  }
+return 0;
 }
